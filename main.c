@@ -5,13 +5,14 @@
 
 int main() {
 
+    SetTraceLogLevel(LOG_WARNING);
     InitWindow(height, width, "HELLO");
 
     while (!WindowShouldClose()) {
 
         BeginDrawing();
 
-        ClearBackground(RAYWHITE);
+        ClearBackground(BLACK);
 
         EndDrawing();
 
