@@ -7,22 +7,22 @@
 
 #define height 1024
 #define width 720
-#define points 7
+#define num_points 10
 
 typedef struct pass_data {
-    Vector2 points_array[7];
+    Vector2 points_array[num_points];
 }pass_data;
 
-extern void perform(pass_data *d);
+extern void create_polygon(pass_data *d);
 
 int main() {
 
     srand(time(NULL));
 
     bool is_not_unique = true;
-    Vector2 points_array[points];
+    Vector2 points_array[num_points];
 
-    for (int t = 0; t < points; t++) {
+    for (int t = 0; t < num_points; t++) {
 
         is_not_unique = true;
 
@@ -31,7 +31,7 @@ int main() {
             int random_x = rand() % (height);
             int random_y = rand() % (width);
 
-            for (int i = 0; i < points; i++) {
+            for (int i = 0; i < num_points; i++) {
 
                 if (points_array[i].x == random_x && points_array[i].y == random_y) {
                     continue;
@@ -48,11 +48,12 @@ int main() {
     }
 
     pass_data my_data;
-    for (int i = 0; i < points; i++) {
+
+    for (int i = 0; i < num_points; i++) {
         my_data.points_array[i] = points_array[i];
     }
 
-    perform(&my_data);
+    create_polygon(&my_data);
 
     SetTraceLogLevel(LOG_WARNING);
     SetTargetFPS(30);
@@ -63,8 +64,15 @@ int main() {
         BeginDrawing();
         ClearBackground(BLACK);
 
+        for (int i = 0; i < num_points; i++) {
+            DrawCircle(my_data.points_array[i].x, my_data.points_array[i].y, 4, PURPLE);
+        }
 
-        DrawLine(points_array[0].x, points_array[0].y, points_array[1].x, points_array[1].y, RED);
+        for (int i = 0; i < (num_points-1); i++) {
+            DrawLine(my_data.points_array[i].x, my_data.points_array[i].y, my_data.points_array[i+1].x, my_data.points_array[i+1].y, GREEN);
+        }
+
+        DrawLine(my_data.points_array[num_points-1].x, my_data.points_array[num_points-1].y, my_data.points_array[0].x, my_data.points_array[0].y, GREEN);
 
         EndDrawing();
 
