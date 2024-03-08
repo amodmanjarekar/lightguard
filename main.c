@@ -34,10 +34,18 @@ int main() {
         }
 
         for (int i = 0; i < (num_points-1); i++) {
-            DrawLine(my_data.points_array[i].x, my_data.points_array[i].y, my_data.points_array[i+1].x, my_data.points_array[i+1].y, GREEN);
+            DrawLine(my_data.points_array[i].x,
+                     my_data.points_array[i].y,
+                     my_data.points_array[i+1].x,
+                     my_data.points_array[i+1].y,
+                     GREEN);
         }
 
-        DrawLine(my_data.points_array[num_points-1].x, my_data.points_array[num_points-1].y, my_data.points_array[0].x, my_data.points_array[0].y, GREEN);
+        DrawLine(my_data.points_array[num_points-1].x,
+                 my_data.points_array[num_points-1].y,
+                 my_data.points_array[0].x,
+                 my_data.points_array[0].y,
+                 GREEN);
 
         EndDrawing();
 

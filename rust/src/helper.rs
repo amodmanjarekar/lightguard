@@ -13,11 +13,11 @@ pub struct PassData {
 }
 
 #[no_mangle]
-pub extern "C" fn create_polygon(d: *mut PassData) {
+pub extern "C" fn create_polygon(my_data: *mut PassData) {
     unsafe {
-        let centroid = calculate_centroid(&(*d).points_array);
+        let centroid = calculate_centroid(&(*my_data).points_array);
         
-        let mut sorted_points: [Vector2; NUM_POINTS] = (*d).points_array.clone();
+        let mut sorted_points: [Vector2; NUM_POINTS] = (*my_data).points_array.clone();
 
         sorted_points.sort_by(|a, b| {
             let angle_a = (a.y - centroid.y).atan2(a.x - centroid.x);
@@ -25,7 +25,7 @@ pub extern "C" fn create_polygon(d: *mut PassData) {
             angle_a.partial_cmp(&angle_b).unwrap()
         });
 
-        (*d).points_array = sorted_points;
+        (*my_data).points_array = sorted_points;
     }
 }
 
