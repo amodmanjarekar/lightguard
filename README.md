@@ -2,6 +2,8 @@
 
 Lightguard is visual implementation of the [Art Gallery Problem](https://en.wikipedia.org/wiki/Art_gallery_problem). It uses ray casting to determine the vision of each security guard (point) that you place into a randomly generated polygonal room.
 
+![thumbnail](./thumbnail.png)
+
 ### Folder Structure
 
 ```
