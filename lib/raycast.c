@@ -1,44 +1,36 @@
 #include <raylib.h>
 #include <raymath.h>
-#include <math.h>
 #include "constants.h"
 
-typedef struct Quad
-{
+typedef struct Quad {
     Vector3 x1;
     Vector3 x2;
     Vector3 y1;
     Vector3 y2;
 } Quad;
 
-Quad getQuad(Vector2 p1, Vector2 p2)
-{
+Quad getQuad(Vector2 p1, Vector2 p2) {
     return (Quad){
         .x1 = (Vector3){.x = p1.x, .y = p1.y, .z = -5},
-        .x2 = (Vector3){.x = p1.x, .y = p1.y, .z = 5},
-        .y1 = (Vector3){.x = p2.x, .y = p2.y, .z = -5},
-        .y2 = (Vector3){.x = p2.x, .y = p2.y, .z = 5}};
+            .x2 = (Vector3){.x = p1.x, .y = p1.y, .z = 5},
+            .y1 = (Vector3){.x = p2.x, .y = p2.y, .z = -5},
+            .y2 = (Vector3){.x = p2.x, .y = p2.y, .z = 5}};
 }
 
-void drawQuad(Quad quad) // debug only
-{
+void drawQuad(Quad quad) {
     DrawLine(quad.x1.x, quad.x1.y, quad.x2.x, quad.x2.y, WHITE);
     DrawLine(quad.x2.x, quad.x2.y, quad.y2.x, quad.y2.y, WHITE);
     DrawLine(quad.y2.x, quad.y2.y, quad.y1.x, quad.y1.y, WHITE);
     DrawLine(quad.y1.x, quad.y1.y, quad.x1.x, quad.x1.y, WHITE);
 }
 
-Vector3 getClosestHit(Vector3 source, Vector3 hits[])
-{
+Vector3 getClosestHit(Vector3 source, Vector3 hits[]) {
     float minDistance = width;
     int minIndex = 0;
-    for (int i = 0; i < num_points; i++)
-    {
-        if (hits[i].z == 0)
-        {
+    for (int i = 0; i < num_points; i++) {
+        if (hits[i].z == 0) {
             int temp = Vector3Distance(source, hits[i]);
-            if (temp < minDistance)
-            {
+            if (temp < minDistance) {
                 minDistance = temp;
                 minIndex = i;
             }
@@ -48,72 +40,59 @@ Vector3 getClosestHit(Vector3 source, Vector3 hits[])
     return hits[minIndex];
 }
 
-void raycastAtPos(Vector3 rayPos, Vector2 collisionPoints[num_points])
-{
+void raycastAtPos(Vector3 rayPos, Vector2 collisionPoints[num_points]) {
     Quad quads[num_points];
 
-    for (int i = 0; i < num_points; i++)
-    {
-        if (i == num_points - 1)
-        {
+    for (int i = 0; i < num_points; i++) {
+        if (i == num_points - 1) {
             quads[i] = getQuad(collisionPoints[i], collisionPoints[0]);
         }
-        else
-        {
+        else {
             quads[i] = getQuad(collisionPoints[i], collisionPoints[i + 1]);
         }
     }
 
     int density = num_rays;
     int num, x, y;
-    for (num = 0; num < density * 4; num++)
-    {
+    for (num = 0; num < density * 4; num++) {
 
-        if (num < density * 2)
-        {
+        if (num < density * 2) {
             x = num - density;
-            if (x > 0)
-            {
+            if (x > 0) {
                 y = density - x;
-            }
-            else
-            {
+            } else {
                 y = density + x;
             }
-        }
-        else
-        {
+        } else {
             x = (density * 3) - num;
-            if (x < 0)
-            {
+            if (x < 0) {
                 y = -density - x;
-            }
-            else
-            {
+            } else { 
                 y = x - density;
             }
         }
 
         Vector3 hits[num_points];
-        for (int i = 0; i < num_points; i++)
-        {
+
+        for (int i = 0; i < num_points; i++) {
             hits[i] = (Vector3){.x = 0, .y = 0, .z = -1};
         }
+
         Vector3 hitPoint;
 
-        for (int j = 0; j < num_points; j++)
-        {
+        for (int j = 0; j < num_points; j++) {
+
             RayCollision col = GetRayCollisionQuad(
-                (Ray){
+
+                    (Ray){
                     .position = rayPos,
                     .direction = (Vector3){.x = x, .y = y, .z = 0}},
-                quads[j].x1,
-                quads[j].y2,
-                quads[j].y1,
-                quads[j].x2);
+                    quads[j].x1,
+                    quads[j].y2,
+                    quads[j].y1,
+                    quads[j].x2);
 
-            if (col.hit == true)
-            {
+            if (col.hit == true) {
                 // printf("%d hit!\n", j);
                 hits[j] = col.point;
             }
@@ -121,11 +100,40 @@ void raycastAtPos(Vector3 rayPos, Vector2 collisionPoints[num_points])
 
         hitPoint = getClosestHit(rayPos, hits);
 
-        // DrawRay(
-        //     (Ray){
-        //         .position = rayPos,
-        //         .direction = (Vector3){.x = x, .y = y, .z = 0}},
-        //     RED);
+        //DrawRay(
+        //    (Ray){
+        //        .position = rayPos,
+        //        .direction = (Vector3){.x = x, .y = y, .z = 0}},
+        //    RED);
         DrawLine(rayPos.x, rayPos.y, hitPoint.x, hitPoint.y, BLUE);
     }
+}
+
+bool outside_check(Vector2 *my_data_points_array, int mouseX, int mouseY) {
+
+    int total_hits = 0;
+
+    for (int i = 0; i < num_points - 1; i++) {
+
+        Quad q1 = getQuad(my_data_points_array[i], my_data_points_array[i+1]);
+
+        Ray r = {
+            .position = (Vector3){ .x = mouseX, .y = mouseY, .z = 0 },
+            .direction = (Vector3){.x = 1, .y = 0, .z = 0}
+        };
+
+        RayCollision rc = GetRayCollisionQuad(r, q1.x1, q1.x2, q1.y1, q1.y2);
+
+        if (rc.hit == true) {
+            total_hits++;
+        }
+
+    }
+
+    if (total_hits % 2 == 0) {
+        return false;
+    }
+
+    return true;
+
 }
