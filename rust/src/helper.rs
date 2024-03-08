@@ -5,7 +5,7 @@ pub struct Vector2 {
     y: f32,
 }
 
-const NUM_POINTS: usize = 100;
+const NUM_POINTS: usize = 20;
 
 #[repr(C)]
 pub struct PassData {

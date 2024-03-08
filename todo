@@ -1,4 +1,4 @@
 [X] Introduce Rust to the codebase.
 [X] Create function to draw a polygon of n sides
 [X] Ray casting for guard
-[ ] Check if guard position is valid
+[X] Check if guard position is valid

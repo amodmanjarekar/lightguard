@@ -5,7 +5,7 @@
 
 #define height 1024
 #define width 720
-#define num_points 100
+#define num_points 20
 #define num_rays 100
 
 typedef struct pass_data {
