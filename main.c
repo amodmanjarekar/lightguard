@@ -1,57 +1,22 @@
-#include <unistd.h>
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <raylib.h>
 #include "./lib/raycast.c"
+#include "./lib/random_points.c"
+#include "./lib/constants.h"
 
-#define height 1024
-#define width 720
-#define num_points 10
-
-typedef struct pass_data {
-    Vector2 points_array[num_points];
-}pass_data;
-
-extern void create_polygon(pass_data *d);
+extern void create_polygon(pass_data *my_data);
 
 int main() {
 
-    srand(time(NULL));
-
-    bool is_not_unique = true;
     Vector2 points_array[num_points];
-
-    for (int t = 0; t < num_points; t++) {
-
-        is_not_unique = true;
-
-        while (is_not_unique) {
-
-            int random_x = rand() % (height);
-            int random_y = rand() % (width);
-
-            for (int i = 0; i < num_points; i++) {
-
-                if (points_array[i].x == random_x && points_array[i].y == random_y) {
-                    continue;
-                } else {
-                    points_array[t] = (Vector2){ .x = random_x, .y = random_y };
-                    is_not_unique = false;
-                    break;
-                }
-
-            }
-
-        }
-
-    }
-
     pass_data my_data;
 
-    for (int i = 0; i < num_points; i++) {
-        my_data.points_array[i] = points_array[i];
-    }
+    srand(time(NULL));
+
+    generate_random_points(points_array);
+
+    copy_to_pass_data(points_array, &my_data);
 
     create_polygon(&my_data);
 
