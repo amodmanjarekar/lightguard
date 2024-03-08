@@ -1,20 +1,23 @@
 #include <raylib.h>
+#include <raymath.h>
+#include <math.h>
+#include "constants.h"
 
-#define DEN 100;
-
-typedef struct Quad {
+typedef struct Quad
+{
     Vector3 x1;
     Vector3 x2;
     Vector3 y1;
     Vector3 y2;
 } Quad;
 
-Quad getQuad(Vector2 p1, Vector2 p2) {
+Quad getQuad(Vector2 p1, Vector2 p2)
+{
     return (Quad){
         .x1 = (Vector3){.x = p1.x, .y = p1.y, .z = -5},
-            .x2 = (Vector3){.x = p1.x, .y = p1.y, .z = 5},
-            .y1 = (Vector3){.x = p2.x, .y = p2.y, .z = -5},
-            .y2 = (Vector3){.x = p2.x, .y = p2.y, .z = 5}};
+        .x2 = (Vector3){.x = p1.x, .y = p1.y, .z = 5},
+        .y1 = (Vector3){.x = p2.x, .y = p2.y, .z = -5},
+        .y2 = (Vector3){.x = p2.x, .y = p2.y, .z = 5}};
 }
 
 void drawQuad(Quad quad) // debug only
@@ -25,13 +28,33 @@ void drawQuad(Quad quad) // debug only
     DrawLine(quad.y1.x, quad.y1.y, quad.x1.x, quad.x1.y, WHITE);
 }
 
-void raycastAtPos(Vector3 rayPos, Vector2 collisionPoints[3])
+Vector3 getClosestHit(Vector3 source, Vector3 hits[])
 {
-    Quad quads[3];
-
-    for (int i = 0; i < 3; i++)
+    float minDistance = width;
+    int minIndex = 0;
+    for (int i = 0; i < num_points; i++)
     {
-        if (i == 2)
+        if (hits[i].z == 0)
+        {
+            int temp = Vector3Distance(source, hits[i]);
+            if (temp < minDistance)
+            {
+                minDistance = temp;
+                minIndex = i;
+            }
+        }
+    }
+
+    return hits[minIndex];
+}
+
+void raycastAtPos(Vector3 rayPos, Vector2 collisionPoints[num_points])
+{
+    Quad quads[num_points];
+
+    for (int i = 0; i < num_points; i++)
+    {
+        if (i == num_points - 1)
         {
             quads[i] = getQuad(collisionPoints[i], collisionPoints[0]);
         }
@@ -41,7 +64,7 @@ void raycastAtPos(Vector3 rayPos, Vector2 collisionPoints[3])
         }
     }
 
-    int density = DEN;
+    int density = num_rays;
     int num, x, y;
     for (num = 0; num < density * 4; num++)
     {
@@ -71,24 +94,32 @@ void raycastAtPos(Vector3 rayPos, Vector2 collisionPoints[3])
             }
         }
 
+        Vector3 hits[num_points];
+        for (int i = 0; i < num_points; i++)
+        {
+            hits[i] = (Vector3){.x = 0, .y = 0, .z = -1};
+        }
         Vector3 hitPoint;
-        for (int j = 0; j < 3; j++)
+
+        for (int j = 0; j < num_points; j++)
         {
             RayCollision col = GetRayCollisionQuad(
-                    (Ray){
+                (Ray){
                     .position = rayPos,
                     .direction = (Vector3){.x = x, .y = y, .z = 0}},
-                    quads[j].x1,
-                    quads[j].y2,
-                    quads[j].y1,
-                    quads[j].x2);
+                quads[j].x1,
+                quads[j].y2,
+                quads[j].y1,
+                quads[j].x2);
 
             if (col.hit == true)
             {
                 // printf("%d hit!\n", j);
-                hitPoint = col.point;
+                hits[j] = col.point;
             }
         }
+
+        hitPoint = getClosestHit(rayPos, hits);
 
         // DrawRay(
         //     (Ray){
